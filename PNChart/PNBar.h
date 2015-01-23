@@ -13,7 +13,8 @@
 
 - (void)rollBack;
 
-@property (nonatomic) float grade;
+@property (nonatomic) float fromPercentage;
+@property (nonatomic) float toPercentage;
 @property (nonatomic) CAShapeLayer *chartLine;
 @property (nonatomic) UIColor *barColor;
 @property (nonatomic) UIColor *barColorGradientStart;

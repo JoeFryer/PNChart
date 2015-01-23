@@ -36,15 +36,16 @@
 }
 
 
-- (void)setGrade:(float)grade
+- (void)setToPercentage:(float)toPercentage
 {
-    NSLog(@"New garde %f",grade);
-
+    NSLog(@"FromPercentage: %f ToPercentage: %f", _fromPercentage, toPercentage);
+    
     UIBezierPath *progressline = [UIBezierPath bezierPath];
-
-    [progressline moveToPoint:CGPointMake(self.frame.size.width / 2.0, self.frame.size.height)];
-    [progressline addLineToPoint:CGPointMake(self.frame.size.width / 2.0, (1 - grade) * self.frame.size.height)];
-
+    
+    CGFloat fromY = self.frame.size.height - (self.frame.size.height * _fromPercentage);
+    [progressline moveToPoint:CGPointMake(self.frame.size.width / 2.0, fromY)];
+    [progressline addLineToPoint:CGPointMake(self.frame.size.width / 2.0, fromY - (toPercentage * self.frame.size.height))];
+    
     [progressline setLineWidth:1.0];
     [progressline setLineCapStyle:kCGLineCapSquare];
 
@@ -56,7 +57,7 @@
         _chartLine.strokeColor = [PNGreen CGColor];
     }
 
-    if (_grade) {
+    if (_toPercentage) {
         
         CABasicAnimation * pathAnimation = [CABasicAnimation animationWithKeyPath:@"path"];
         pathAnimation.fromValue = (id)_chartLine.path;
@@ -118,7 +119,7 @@
         }
     }
     
-    _grade = grade;
+    _toPercentage = toPercentage;
 
 }
 
@@ -138,7 +139,7 @@
     }
     _barColorGradientStart = barColorGradientStart;
 
-    [self setGrade:_grade];
+    [self setToPercentage:_toPercentage];
 
 }
 

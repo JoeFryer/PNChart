@@ -18,6 +18,8 @@
 
 - (UIColor *)barColorAtIndex:(NSUInteger)index;
 
+@property (nonatomic) NSInteger yValueMin;
+
 @end
 
 @implementation PNBarChart
@@ -73,6 +75,7 @@
     } else {
         [self getYValueMax:yValues];
     }
+    [self getYValueMin:yValues];
     
     if (_yChartLabels) {
         [self viewCleanupForCollection:_yChartLabels];
@@ -87,7 +90,11 @@
         
         for (int index = 0; index < _yLabelSum; index++) {
             
-            NSString *labelText = _yLabelFormatter((float)_yValueMax * ( (_yLabelSum - index) / (float)_yLabelSum ));
+            CGFloat range = _yValueMax - _yValueMin;
+            CGFloat increment = range / _yLabelSum;
+            CGFloat value = _yValueMin + ((_yLabelSum - index) * increment);
+            NSString *labelText = _yLabelFormatter(value);
+            
             
             PNChartLabel * label = [[PNChartLabel alloc] initWithFrame:CGRectMake(0,
                                                                                   yLabelSectionHeight * index + _chartMargin - yLabelHeight/2.0,
@@ -119,6 +126,15 @@
     if (_yValueMax == 0) {
         _yValueMax = _yMinValue;
     }
+}
+
+- (void)getYValueMin:(NSArray *)yLabels
+{
+    NSInteger min = [[yLabels valueForKeyPath:@"@min.intValue"] integerValue];
+    if (min > 0) {
+        min = 0;
+    }
+    _yValueMin = min;
 }
 
 - (void)setXLabels:(NSArray *)xLabels
@@ -232,12 +248,19 @@
         //Height Of Bar
         float value = [valueString floatValue];
         
-        float grade = (float)value / (float)_yValueMax;
+        CGFloat range = _yValueMax - _yValueMin;
+        float grade = (float)value / (float)range;
         
         if (isnan(grade)) {
             grade = 0;
         }
-        bar.grade = grade;
+        
+        CGFloat barFromPercentage = 0.0f;
+        if (_yValueMin < 0) {
+            barFromPercentage = fabsf(_yValueMin) / range;
+        }
+        bar.fromPercentage = barFromPercentage;
+        bar.toPercentage = grade;
         
         index += 1;
     }
